@@ -1,16 +1,18 @@
-#!/bin/bash
-# This deploy hook gets executed after dependencies are resolved and the
-# build hook has been run but before the application has been started back
-# up again.  This script gets executed directly, so it could be python, php,
-# ruby, etc.
+#!/bin/bash 
 
+echo "Creating persistent Ghost data directory"
+if [ ! -d "$OPENSHIFT_DATA_DIR/content/data" ]; then
+	mkdir -p $OPENSHIFT_DATA_DIR/content/data
+fi
+echo "Creating persistent Ghost images directory"
+if [ ! -d "$OPENSHIFT_DATA_DIR/content/images" ]; then
+	mkdir -p $OPENSHIFT_DATA_DIR/content/images
+fi
+echo "Symlinking data directory"
+rm -rf $OPENSHIFT_REPO_DIR/content/data
+ln -sf $OPENSHIFT_DATA_DIR/content/data $OPENSHIFT_REPO_DIR/content/data
+echo "Symlinking images directory"
+rm -rf $OPENSHIFT_REPO_DIR/content/images
+ln -sf $OPENSHIFT_DATA_DIR/content/images $OPENSHIFT_REPO_DIR/content/images
 
-#  Source utility functions.
-source "$OPENSHIFT_REPO_DIR/.openshift/lib/utils"
-
-
-#  On slave/serving gears, need to do the install as part of deploy
-#  so check if its needed. Just ensure the custom Node[.js] version is
-#  installed.
-ensure_node_is_installed
 
